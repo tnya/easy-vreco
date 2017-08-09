@@ -7,12 +7,23 @@ function initMap(){/* initMap inicializa el mapa */
 		streetViewControl:false
 	});
 
+//Llamar id's de los input de origen y destino
+	var inicio = document.getElementById("input-origen");
+	var fin = document.getElementById("input-destino");
+
+	var autocomplete = new google.maps.places.Autocomplete(inicio);
+	autocomplete.bindTo("bounds",map)
+
+	var autocomplete = new google.maps.places.Autocomplete(fin);
+	autocomplete.bindTo("bounds",map)
+
+//Funcion que busca ubicacion
 	function buscar(){/* va dentro de initMap() */
 		if(navigator.geolocation){
 			navigator.geolocation.getCurrentPosition(funcionExito,funcionError);
 		}
 	}
-	/*	getCurrentPosition permite saber ubicacion actual del user 
+	/*	getCurrentPosition permite saber ubicacion actual del user
 		funcionExito se ejecuta solo cuando el user comparte su ubicacion
 		funcionError se ejecuta cuando se produce un error en la geolocalizacion
 	*/
@@ -20,7 +31,30 @@ function initMap(){/* initMap inicializa el mapa */
 
 	document.getElementById("encuentrame").addEventListener("click",buscar); //"encuentrame" es el boton en HTML
 
+	document.getElementById("ruta").addEventListener("click",function(){
+		var directionsService = new google.maps.DirectionsService;
+		var directionsDisplay = new google.maps.DirectionsRenderer;
+
+		directionsDisplay.setMap(map);
+
+		var inicio = document.getElementById("input-origen").value;
+		var fin = document.getElementById("input-destino").value;
+
+		var request = {
+			origin: inicio,
+			destination: fin,
+			travelMode: "DRIVING"
+		};
+
+		directionsService.route(request, function(result, status){
+			if (status == "OK"){
+				directionsDisplay.setDirections(result);
+			}
+		})
+	});
+
 	var latitud,longitud;
+
 
 	var funcionExito = function(posicion){
 		latitud = posicion.coords.latitude;
@@ -38,8 +72,14 @@ function initMap(){/* initMap inicializa el mapa */
 
 
 	var funcionError = function(error){
-		alert("Tenemos un problema con encontrar tu ubicación");
+		alert("No encontramos tu ubicación");
 	}
-
 }
+//Libreria GMPS (permite reconocer lugares y autocomplete de datos)
+	var inputOrigen =(document.getElementById('inicio'));
+	var autocompleteOrigen = new google.maps.places.Autocomplete(inputOrigen);
+	autocompleteOrigen.bindTo('bounds', map);
 
+	var inputDestino = document.getElementById("fin");
+	var autocompleteDestino = new google.maps.places.Autocomplete(inputDestino);
+	autocompleteDestino.bindTo('bounds', map);
